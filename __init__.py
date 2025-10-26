@@ -19,8 +19,8 @@ class YSC_HighResFix:
                 "model": ("MODEL",),
                 "vae": ("VAE",),
                 "image": ("IMAGE",),
-                "positive": ("CONDITIONING"),
-                "negative": ("CONDITIONING"),
+                "positive": ("CONDITIONING",),
+                "negative": ("CONDITIONING",),
                 "upscale_factor": ("FLOAT", {
                     "default": 2.0,
                     "min": 1.0,
@@ -52,15 +52,15 @@ class YSC_HighResFix:
                     "default": 0.5,
                     "min": 0.0,
                     "max": 1.0,
-                    "step": 1.01
+                    "step": 0.01
                 }),
                 "upscale_model": ("UPSCALE_MODEL",),
             },
-            "optional": []
+            "optional": {}
         }
     
-    RETURN_TYPES = ("LATENT")
-    RETURN_NAMES = ("LATENT")
+    RETURN_TYPES = ("LATENT",)
+    RETURN_NAMES = ("LATENT",)
     FUNCTION = "refine_upscale"
     CATEGORY = "image/upscaling"
 
@@ -68,31 +68,29 @@ class YSC_HighResFix:
     def refine_upscale(self, model, vae, image: torch.Tensor, positive, negative, upscale_factor,
                        upscale_method, seed, steps, cfg, sampler_name,
                        scheduler, denoise, upscale_model):
-        samples = image.movedim(-1,1)
+        
+        samples_upscaled_bhwc = self.image_scaler.upscale(upscale_model, image)[0]
+        
+        samples = samples_upscaled_bhwc.movedim(-1,1)
 
-        width = round(samples.shape[3] * upscale_factor)
-        height = round(samples.shape[2] * upscale_factor)
+        target_width = round(image.shape[2] * upscale_factor)
+        target_height = round(image.shape[1] * upscale_factor)
 
-        samples = self.__imageScaler.upscale(upscale_model, image)[0].movedim(-1,1)
+        upscaled_width = samples.shape[3]
+        upscaled_height = samples.shape[2]
 
-        upscaled_width = round(samples.shape[3])
-        upscaled_height = round(samples.shape[2])
+        if upscaled_width > target_width or upscaled_height > target_height:
+            print(f"[YSC HighResFix]: Resizing from {upscaled_width}x{upscaled_height} to {target_width}x{target_height}")
+            samples = comfy.utils.common_upscale(samples, target_width, target_height, upscale_method, "disabled")
+        
+        pixels = samples.movedim(1, -1)
+        latent_image = vae.encode(pixels[:,:,:,:3])
 
-        if upscaled_width > width or upscaled_height > height:
-            samples = comfy.utils.common_upscale(samples, width, height, upscale_method, "disabled")
-            print("[YSC HighResFix]: Image upscaled!")
-            
-        samples = samples.movedim(1,-1)
-
-        latent_sample = samples.movedim(-1, 1)  # B H W C -> B C H W
-        if latent_sample.shape[1] == 4:
-            latent_sample = latent_sample[:, :3, :, :]  # Converter para RGB se necessário
-        vae_input = latent_sample.to(self.device).float()
-        latent_image = vae.encode(vae_input)
-        latent = {"latent_sample": latent_image}
+        
+        latent = {"samples": latent_image} 
         print("[YSC HighResFix]: Upscaled image is now latent")
 
-        latent_sample = comfy.sample.sample(
+        latent_sample_out = comfy.sample.sample( 
             model=model,
             noise_seed=seed,
             steps=steps,
@@ -105,10 +103,8 @@ class YSC_HighResFix:
             denoise=denoise
         )
 
+        return ({"samples": latent_sample_out}, )
 
-        
-    
-# Registro do nó
 NODE_CLASS_MAPPINGS = {
     "YSC_HighresFix": YSC_HighResFix
 }
