@@ -90,9 +90,12 @@ class YSC_HighResFix:
         latent = {"samples": latent_image} 
         print("[YSC HighResFix]: Upscaled image is now latent")
 
+        torch.manual_seed(seed) 
+        noise = torch.randn_like(latent_image)
+
         latent_sample_out = comfy.sample.sample( 
             model=model,
-            noise_seed=seed,
+            noise=noise,
             steps=steps,
             cfg=cfg,
             sampler_name=sampler_name,
