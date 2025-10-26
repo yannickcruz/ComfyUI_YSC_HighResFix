@@ -80,13 +80,37 @@ class YSC_HighResFix:
 
         if upscaled_width > width or upscaled_height > height:
             samples = comfy.utils.common_upscale(samples, width, height, upscale_method, "disabled")
+            print("[YSC HighResFix]: Image upscaled!")
             
         samples = samples.movedim(1,-1)
+
+        latent_sample = samples.movedim(-1, 1)  # B H W C -> B C H W
+        if latent_sample.shape[1] == 4:
+            latent_sample = latent_sample[:, :3, :, :]  # Converter para RGB se necessário
+        vae_input = latent_sample.to(self.device).float()
+        latent_image = vae.encode(vae_input)
+        latent = {"latent_sample": latent_image}
+        print("[YSC HighResFix]: Upscaled image is now latent")
+
+        latent_sample = comfy.sample.sample(
+            model=model,
+            noise_seed=seed,
+            steps=steps,
+            cfg=cfg,
+            sampler_name=sampler_name,
+            scheduler=scheduler,
+            positive=positive,
+            negative=negative,
+            latent_image=latent,
+            denoise=denoise
+        )
+
+
         
     
 # Registro do nó
 NODE_CLASS_MAPPINGS = {
-    "YSC_HighresFix": YSC_HighresFix
+    "YSC_HighresFix": YSC_HighResFix
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
