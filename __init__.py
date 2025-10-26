@@ -102,7 +102,7 @@ class YSC_HighResFix:
             scheduler=scheduler,
             positive=positive,
             negative=negative,
-            latent_image=latent,
+            latent_image=latent_image,
             denoise=denoise
         )
 
