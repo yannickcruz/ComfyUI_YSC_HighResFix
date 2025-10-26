@@ -39,7 +39,7 @@ This output latent is then ready to be passed to a `KSampler` node (or similar) 
 1.  Navigate to your `ComfyUI/custom_nodes/` directory.
 2.  Clone this repository:
     ```bash
-    git clone [https://github.com/yannickcruz/ComfyUI-YSC-HighResFix.git](https://github.com/yannickcruz/ComfyUI-YSC-HighResFix.git)
+    git clone https://github.com/yannickcruz/ComfyUI-YSC-HighResFix.git
     ```
     (Replace the URL with your actual repository URL)
 3.  Alternatively, download the `.py` files from this repository and place them directly in the `ComfyUI/custom_nodes/` directory.
