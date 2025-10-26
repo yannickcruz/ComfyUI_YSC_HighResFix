@@ -65,7 +65,9 @@ class YSC_HighResFix:
     CATEGORY = "image/upscaling"
 
 
-    def image_upscale(self, upscale_model, image, upscale_factor, upscale_method):
+    def refine_upscale(self, model, vae, image: torch.Tensor, positive, negative, upscale_factor,
+                       upscale_method, seed, steps, cfg, sampler_name,
+                       scheduler, denoise, upscale_model):
         samples = image.movedim(-1,1)
 
         width = round(samples.shape[3] * upscale_factor)
@@ -80,7 +82,7 @@ class YSC_HighResFix:
             samples = comfy.utils.common_upscale(samples, width, height, upscale_method, "disabled")
             
         samples = samples.movedim(1,-1)
-        return (samples,)
+        
     
 # Registro do nó
 NODE_CLASS_MAPPINGS = {
