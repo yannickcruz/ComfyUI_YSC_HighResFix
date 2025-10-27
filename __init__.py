@@ -26,7 +26,7 @@ class YSC_HighResFix:
                     "min": 1.0,
                     "max": 4.0,
                     "step": 0.01,
-                    "display": "slider"
+                    "display": "number"
                 }),
                 "upscale_method": (["nearest-exact", "bilinear", "bicubic", "lanczos"],),
                 "seed": ("INT", {
