@@ -28,7 +28,7 @@ Documentation = "https://github.com/yannickcruz/ComfyUI_YSC_HighResFix/wiki"
 "Bug Tracker" = "https://github.com/yannickcruz/ComfyUI_YSC_HighResFix/issues"
 
 [tool.comfy]
-PublisherId = ""
+PublisherId = "yannickcruz"
 DisplayName = "ComfyUI_YSC_HighResFix"
 Icon = ""
 includes = [] 
