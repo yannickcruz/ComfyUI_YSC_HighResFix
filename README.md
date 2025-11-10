@@ -49,6 +49,8 @@ The node's operation is straightforward:
 3.  Alternatively, download the `.py` files from this repository and place them directly in the `ComfyUI/custom_nodes/` directory.
 4.  Restart **[ComfyUI](https://github.com/comfyanonymous/ComfyUI)**.
 
+**You can now install this node via ComfyUI Manager!**
+
 ## Credits
 
 * This node was possible thanks to the code of the [TheBill2001's](https://github.com/TheBill2001) [comfyui-upscale-by-model](https://github.com/TheBill2001/comfyui-upscale-by-model/tree/main), that inspired me to build the first raw upscale of this node.
